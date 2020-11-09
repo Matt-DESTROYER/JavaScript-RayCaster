@@ -9,7 +9,7 @@ var level1 = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 3, 0, 3, 0, 0, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 3, 5, 3, 0, 0, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 3, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1],
@@ -32,6 +32,10 @@ var level1 = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
 
+var level2 = [
+	
+]
+
 var player = {
     x: 16,
     y: 10,
@@ -52,7 +56,7 @@ var miniMapScale = 8;
 var screenWidth = 320;
 var screenHeight = 200;
 
-var stripWidth = 2;
+var stripWidth = 1;
 var fov = 60 * Math.PI / 180;
 
 var numRays = Math.ceil(screenWidth / stripWidth);
@@ -65,17 +69,13 @@ var twoPI = Math.PI * 2;
 var numTextures = 4;
 
 function init() {
-
-    mapWidth = level1[0].length;
+	mapWidth = level1[0].length;
     mapHeight = level1.length;
 
     bindKeys();
-
-    initScreen();
-
-    drawMiniMap();
-
-    gameCycle();
+	initScreen();
+	drawMiniMap();
+	gameCycle();
 }
 
 var screenStrips = [];
@@ -181,15 +181,15 @@ function bindKeys() {
     }
 }
 
+function render() {
+	updateMiniMap();
+	castRays();
+}
+
 function gameCycle() {
-
-    move();
-
-    updateMiniMap();
-
-    castRays();
-
-    setTimeout(gameCycle, 1000 / 30); // aim for 30 FPS
+	move();
+	render();
+	setTimeout(gameCycle, 1000 / 60);
 }
 
 
@@ -198,30 +198,26 @@ function castRays() {
     var stripIdx = 0;
 
     for (var i = 0; i < numRays; i++) {
-        // where on the screen does ray go through?
-        var rayScreenPos = (-numRays / 2 + i) * stripWidth;
+		var rayScreenPos = (-numRays / 2 + i) * stripWidth;
 
-        // the distance from the viewer to the point on the screen, simply Pythagoras.
-        var rayViewDist = Math.sqrt(rayScreenPos * rayScreenPos + viewDist * viewDist);
+        
+		var rayViewDist = Math.sqrt(rayScreenPos * rayScreenPos + viewDist * viewDist);
 
-        // the angle of the ray, relative to the viewing direction.
-        // right triangle: a = sin(A) * c
-        var rayAngle = Math.asin(rayScreenPos / rayViewDist);
+        
+		var rayAngle = Math.asin(rayScreenPos / rayViewDist);
 
         castSingleRay(
-            player.rot + rayAngle, // add the players viewing direction to get the angle in world space
-            stripIdx++
+            player.rot + rayAngle,
+			stripIdx++
         );
     }
 }
 
 function castSingleRay(rayAngle, stripIdx) {
 
-    // first make sure the angle is between 0 and 360 degrees
     rayAngle %= twoPI;
     if (rayAngle < 0) rayAngle += twoPI;
 
-    // moving right/left? up/down? Determined by which quadrant the angle is in.
     var right = (rayAngle > twoPI * 0.75 || rayAngle < twoPI * 0.25);
     var up = (rayAngle < 0 || rayAngle > Math.PI);
 
@@ -231,7 +227,7 @@ function castSingleRay(rayAngle, stripIdx) {
     var angleSin = Math.sin(rayAngle);
     var angleCos = Math.cos(rayAngle);
 
-    var dist = 0; // the distance to the block we hit
+    var dist = 0; // the distance to the block the ray hit
     var xHit = 0; // the x and y coord of where the ray hit the block
     var yHit = 0;
 
