@@ -1,9 +1,11 @@
 var $ = function(id) {
 	return document.getElementById(id);
 };
+
 var dc = function(tag) {
 	return document.createElement(tag);
 };
+
 var level1 = [
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -42,6 +44,7 @@ var player = {
 	moveSpeed: 0.18,
 	rotSpeed: 6 * Math.PI / 180
 }
+
 var mapWidth = 0;
 var mapHeight = 0;
 var miniMapScale = 8;
@@ -58,6 +61,7 @@ let average = 0;
 let placeholder1 = 0;
 let placeholder2 = 0;
 let avFPS = [];
+let deg90 = 90 * (Math.PI / 180)
 
 function init() {
 	mapWidth = level1[0].length;
@@ -67,7 +71,6 @@ function init() {
 	drawMiniMap();
 	gameCycle();
 }
-
 var screenStrips = [];
 
 function initScreen() {
@@ -85,18 +88,19 @@ function initScreen() {
 		img.style.position = "absolute";
 		img.style.left = "0px";
 		strip.appendChild(img);
-		strip.img = img; // assign the image to a property on the strip element so we have easy access to the image later
+		strip.img = img;
 		screenStrips.push(strip);
 		screen.appendChild(strip);
 	}
 }
-// bind keyboard events to game functions (movement, etc)
+
 function bindKeys() {
 	document.onkeydown = function(e) {
 		e = e || window.event;
 		switch (e.keyCode) {
 			case 87:
 				player.speed = 1;
+
 				break;
 			case 83:
 				player.speed = -1;
@@ -175,37 +179,31 @@ function castSingleRay(rayAngle, stripIdx) {
 	var right = (rayAngle > twoPI * 0.75 || rayAngle < twoPI * 0.25);
 	var up = (rayAngle < 0 || rayAngle > Math.PI);
 	var wallType = 0;
-	// only do these once
 	var angleSin = Math.sin(rayAngle);
 	var angleCos = Math.cos(rayAngle);
-	var dist = 0; // the distance to the block the ray hit
-	var xHit = 0; // the x and y coord of where the ray hit the block
+	var dist = 0;
+	var xHit = 0;
 	var yHit = 0;
-	var textureX; // the x-coord on the texture of the block, ie. what part of the texture are we going to render
-	var wallX; // the (x,y) map coords of the block
+	var textureX;
+	var wallX;
 	var wallY;
 	var wallIsHorizontal = false;
-	// first check against the vertical map/wall lines
-	// we do this by moving to the right or left edge of the block we're standing in
-	// and then moving in 1 map unit steps horizontally. The amount we have to move vertically
-	// is determined by the slope of the ray, which is simply defined as sin(angle) / cos(angle).
-	var slope = angleSin / angleCos; // the slope of the straight line made by the ray
-	var dXVer = right ? 1 : -1; // we move either 1 map unit to the left or right
-	var dYVer = dXVer * slope; // how much to move up or down
-	var x = right ? Math.ceil(player.x) : Math.floor(player.x); // starting horizontal position, at one of the edges of the current map block
-	var y = player.y + (x - player.x) * slope; // starting vertical position. We add the small horizontal step we just made, multiplied by the slope.
+	var slope = angleSin / angleCos;
+	var dXVer = right ? 1 : -1;
+	var dYVer = dXVer * slope;
+	var x = right ? Math.ceil(player.x) : Math.floor(player.x);
+	var y = player.y + (x - player.x) * slope;
 	while (x >= 0 && x < mapWidth && y >= 0 && y < mapHeight) {
-		var wallX = Math.floor(x + (right ? 0 : -1));
-		var wallY = Math.floor(y);
-		// is this point inside a wall block?
+		wallX = Math.floor(x + (right ? 0 : -1));
+		wallY = Math.floor(y);
 		if (level1[wallY][wallX] > 0) {
 			var distX = x - player.x;
 			var distY = y - player.y;
-			dist = distX * distX + distY * distY; // the distance from the player to this point, squared.
-			wallType = level1[wallY][wallX]; // we'll remember the type of wall we hit for later
-			textureX = y % 1; // where exactly are we on the wall? textureX is the x coordinate on the texture that we'll use later when texturing the wall.
-			if (!right) textureX = 1 - textureX; // if we're looking to the left side of the map, the texture should be reversed
-			xHit = x; // save the coordinates of the hit. We only really use these to draw the rays on minimap.
+			dist = distX * distX + distY * distY;
+			wallType = level1[wallY][wallX];
+			textureX = y % 1;
+			if (!right) textureX = 1 - textureX;
+			xHit = x;
 			yHit = y;
 			wallIsHorizontal = true;
 			break;
@@ -213,21 +211,17 @@ function castSingleRay(rayAngle, stripIdx) {
 		x += dXVer;
 		y += dYVer;
 	}
-	// now check against horizontal lines. It's basically the same, just "turned around".
-	// the only difference here is that once we hit a map block, 
-	// we check if there we also found one in the earlier, vertical run. We'll know that if dist != 0.
-	// If so, we only register this hit if this distance is smaller.
-	var slope = angleCos / angleSin;
+	slope = angleCos / angleSin;
 	var dYHor = up ? -1 : 1;
 	var dXHor = dYHor * slope;
-	var y = up ? Math.floor(player.y) : Math.ceil(player.y);
-	var x = player.x + (y - player.y) * slope;
+	y = up ? Math.floor(player.y) : Math.ceil(player.y);
+	x = player.x + (y - player.y) * slope;
 	while (x >= 0 && x < mapWidth && y >= 0 && y < mapHeight) {
-		var wallY = Math.floor(y + (up ? -1 : 0));
-		var wallX = Math.floor(x);
+		wallY = Math.floor(y + (up ? -1 : 0));
+		wallX = Math.floor(x);
 		if (level1[wallY][wallX] > 0) {
-			var distX = x - player.x;
-			var distY = y - player.y;
+			distX = x - player.x;
+			distY = y - player.y;
 			var blockDist = distX * distX + distY * distY;
 			if (!dist || blockDist < dist) {
 				dist = blockDist;
@@ -243,20 +237,11 @@ function castSingleRay(rayAngle, stripIdx) {
 		y += dYHor;
 	}
 	if (dist) {
-		//drawRay(xHit, yHit);
 		var strip = screenStrips[stripIdx];
 		dist = Math.sqrt(dist);
-		// use perpendicular distance to adjust for fish eye
-		// distorted_dist = correct_dist / cos(relative_angle_of_ray)
 		dist = dist * Math.cos(player.rot - rayAngle);
-		// now calc the position, height and width of the wall strip
-		// "real" wall height in the game world is 1 unit, the distance from the player to the screen is viewDist,
-		// thus the height on the screen is equal to wall_height_real * viewDist / dist
 		var height = Math.round(viewDist / dist);
-		// width is the same, but we have to stretch the texture to a factor of stripWidth to make it fill the strip correctly
 		var width = height * stripWidth;
-		// top placement is easy since everything is centered on the x-axis, so we simply move
-		// it half way down the screen and then half the wall height back up.
 		var top = Math.round((screenHeight - height) / 2);
 		strip.style.height = height + "px";
 		strip.style.top = top + "px";
@@ -294,8 +279,8 @@ function move() {
 	} else {
 		var strafeStep = player.strafe * player.moveSpeed;
 		player.rot += player.dir * player.rotSpeed;
-		var newX = player.x + Math.cos(player.rot + 1.5708) * strafeStep;
-		var newY = player.y + Math.sin(player.rot + 1.5708) * strafeStep;
+		var newX = player.x + Math.cos(player.rot + deg90) * strafeStep;
+		var newY = player.y + Math.sin(player.rot + deg90) * strafeStep;
 	}
 	if (isBlocking(newX, newY)) { // are we allowed to move to the new position?
 		return; // no, bail out.
@@ -339,28 +324,23 @@ function drawMiniMap() {
 	var miniMap = $("minimap"); // the actual map
 	var miniMapCtr = $("minimapcontainer"); // the container div element
 	var miniMapObjects = $("minimapobjects"); // the canvas used for drawing the objects on the map (player character, etc)
-	miniMap.width = mapWidth * miniMapScale; // resize the internal canvas dimensions 
-	miniMap.height = mapHeight * miniMapScale; // of both the map canvas and the object canvas
+	miniMap.width = mapWidth * miniMapScale;
+	miniMap.height = mapHeight * miniMapScale;
 	miniMapObjects.width = miniMap.width;
 	miniMapObjects.height = miniMap.height;
-	var w = (mapWidth * miniMapScale) + "px" // minimap CSS dimensions
-	var h = (mapHeight * miniMapScale) + "px"
+	var w = (mapWidth * miniMapScale) + "px";
+	var h = (mapHeight * miniMapScale) + "px";
 	miniMap.style.width = miniMapObjects.style.width = miniMapCtr.style.width = w;
 	miniMap.style.height = miniMapObjects.style.height = miniMapCtr.style.height = h;
 	var ctx = miniMap.getContext("2d");
 	ctx.fillStyle = "white";
 	ctx.fillRect(0, 0, miniMap.width, miniMap.height);
-	// loop through all blocks on the map
 	for (var y = 0; y < mapHeight; y++) {
 		for (var x = 0; x < mapWidth; x++) {
 			var wall = level1[y][x];
-			if (wall > 0) { // if there is a wall block at this (x,y) ...
+			if (wall > 0) {
 				ctx.fillStyle = "rgb(200,200,200)";
-				ctx.fillRect( // ... then draw a block on the minimap
-					x * miniMapScale,
-					y * miniMapScale,
-					miniMapScale, miniMapScale
-				);
+				ctx.fillRect(x * miniMapScale, y * miniMapScale, miniMapScale, miniMapScale);
 			}
 		}
 	}
@@ -376,7 +356,6 @@ function drawFPS() {
 	context.clearRect(0, 0, canvas.width, canvas.height);
 	context.fillText("FPS: " + average, 7.5, 32.5);
 }
-	
 // FPS SENSING
 function getFPS() {
 	placeholder1 = performance.now()
