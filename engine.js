@@ -62,9 +62,9 @@ let deg90 = 90 * (Math.PI / 180)
 function init() {
 	mapWidth = level1[0].length;
 	mapHeight = level1.length;
-	bindKeys();
 	initScreen();
 	drawMiniMap();
+	bindKeys();
 	gameCycle();
 }
 var screenStrips = [];
@@ -113,14 +113,9 @@ function bindKeys() {
 			case 39:
 				player.dir = 1;
 				break;
-			case 38:
-				player.dirY = 1;
-				break;
-			case 40:
-				player.dirY = -1;
-				break;
 		}
 	}
+	
 	document.onkeyup = function(e) {
 		e = e || window.event;
 		switch (e.keyCode) {
@@ -135,10 +130,6 @@ function bindKeys() {
 			case 37:
 			case 39:
 				player.dir = 0;
-				break;
-			case 38:
-			case 40:
-				player.dirY = 0;
 				break;
 		}
 	}
@@ -299,7 +290,7 @@ function updateMiniMap() {
 	var objectCtx = miniMapObjects.getContext("2d");
 	miniMapObjects.width = miniMapObjects.width;
 	objectCtx.fillStyle = "red";
-	objectCtx.fillRect( // draw a dot at the current player position
+	objectCtx.fillRect(
 		player.x * miniMapScale - 2,
 		player.y * miniMapScale - 2,
 		4, 4
@@ -308,18 +299,17 @@ function updateMiniMap() {
 	objectCtx.beginPath();
 	objectCtx.moveTo(player.x * miniMapScale, player.y * miniMapScale);
 	objectCtx.lineTo(
-		(player.x + Math.cos(player.rot) * 4) * miniMapScale,
-		(player.y + Math.sin(player.rot) * 4) * miniMapScale
+		(player.x + Math.cos(player.rot)) * miniMapScale,
+		(player.y + Math.sin(player.rot)) * miniMapScale
 	);
 	objectCtx.closePath();
 	objectCtx.stroke();
 }
 
 function drawMiniMap() {
-	// draw the topdown view minimap
-	var miniMap = $("minimap"); // the actual map
-	var miniMapCtr = $("minimapcontainer"); // the container div element
-	var miniMapObjects = $("minimapobjects"); // the canvas used for drawing the objects on the map (player character, etc)
+	var miniMap = $("minimap");
+	var miniMapCtr = $("minimapcontainer");
+	var miniMapObjects = $("minimapobjects");
 	miniMap.width = mapWidth * miniMapScale;
 	miniMap.height = mapHeight * miniMapScale;
 	miniMapObjects.width = miniMap.width;
@@ -344,6 +334,7 @@ function drawMiniMap() {
 }
 setTimeout(init, 1);
 
+// FPS DRAWING
 function drawFPS() {
 	var canvas = document.getElementById("fps");
 	var context = canvas.getContext("2d");
@@ -352,6 +343,7 @@ function drawFPS() {
 	context.clearRect(0, 0, canvas.width, canvas.height);
 	context.fillText("FPS: " + average, 7.5, 32.5);
 }
+
 // FPS SENSING
 function getFPS() {
 	placeholder1 = performance.now()
