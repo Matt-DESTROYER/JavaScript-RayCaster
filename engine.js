@@ -1,11 +1,9 @@
 var $ = function(id) {
 	return document.getElementById(id);
 };
-
 var dc = function(tag) {
 	return document.createElement(tag);
 };
-
 var level1 = [
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -32,7 +30,6 @@ var level1 = [
 	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
-
 var player = {
 	x: 16,
 	y: 10,
@@ -44,7 +41,6 @@ var player = {
 	moveSpeed: 0.18,
 	rotSpeed: 6 * Math.PI / 180
 }
-
 var mapWidth = 0;
 var mapHeight = 0;
 var miniMapScale = 8;
@@ -279,22 +275,22 @@ function move() {
 	} else {
 		var strafeStep = player.strafe * player.moveSpeed;
 		player.rot += player.dir * player.rotSpeed;
-		var newX = player.x + Math.cos(player.rot + deg90) * strafeStep;
-		var newY = player.y + Math.sin(player.rot + deg90) * strafeStep;
+		newX = player.x + Math.cos(player.rot + deg90) * strafeStep;
+		newY = player.y + Math.sin(player.rot + deg90) * strafeStep;
 	}
-	if (isBlocking(newX, newY)) { // are we allowed to move to the new position?
-		return; // no, bail out.
+	if (isBlocking(newX, newY)) {
+		return;
 	}
-	player.x = newX; // set new position
+	player.x = newX;
 	player.y = newY;
 }
 
 function isBlocking(x, y) {
-	// first make sure that we cannot move outside the boundaries of the level
-	if (y < 0 || y >= mapHeight || x < 0 || x >= mapWidth)
+	if (y < 0 || y >= mapHeight || x < 0 || x >= mapWidth) {
 		return true;
-	// return true if the map block is not 0, ie. if there is a blocking wall.
-	return (level1[Math.floor(y)][Math.floor(x)] != 0 || level1[Math.floor(y)][Math.floor(x)] != 5);
+	} else {
+		return (level1[Math.floor(y)][Math.floor(x)] != 0 || level1[Math.floor(y)][Math.floor(x)] != 5);
+	}
 }
 
 function updateMiniMap() {
