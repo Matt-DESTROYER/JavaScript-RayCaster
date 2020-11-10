@@ -58,6 +58,7 @@ let placeholder1 = 0;
 let placeholder2 = 0;
 let avFPS = [];
 let deg90 = 90 * (Math.PI / 180)
+let level = 1;
 
 function init() {
 	mapWidth = level1[0].length;
@@ -96,20 +97,24 @@ function bindKeys() {
 		switch (e.keyCode) {
 			case 87:
 				player.speed = 1;
-
 				break;
+				
 			case 83:
 				player.speed = -1;
 				break;
+				
 			case 65:
 				player.strafe = -1;
 				break;
+				
 			case 68:
 				player.strafe = 1;
 				break;
+				
 			case 37:
 				player.dir = -1;
 				break;
+				
 			case 39:
 				player.dir = 1;
 				break;
@@ -258,11 +263,13 @@ function drawRay(rayX, rayY) {
 }
 
 function move() {
+	let newX;
+	let newY;
 	if (player.strafe === 0) {
 		var moveStep = player.speed * player.moveSpeed;
 		player.rot += player.dir * player.rotSpeed;
-		var newX = player.x + Math.cos(player.rot) * moveStep;
-		var newY = player.y + Math.sin(player.rot) * moveStep;
+		newX = player.x + Math.cos(player.rot) * moveStep;
+		newY = player.y + Math.sin(player.rot) * moveStep;
 	} else {
 		var strafeStep = player.strafe * player.moveSpeed;
 		player.rot += player.dir * player.rotSpeed;
@@ -271,16 +278,26 @@ function move() {
 	}
 	if (isBlocking(newX, newY)) {
 		return;
+	} else {
+		player.x = newX;
+		player.y = newY;
 	}
-	player.x = newX;
-	player.y = newY;
 }
 
 function isBlocking(x, y) {
 	if (y < 0 || y >= mapHeight || x < 0 || x >= mapWidth) {
 		return true;
 	} else {
-		return (level1[Math.floor(y)][Math.floor(x)] != 0 || level1[Math.floor(y)][Math.floor(x)] != 5);
+		if (level1[Math.floor(y)][Math.floor(x)] != 0) {
+			if (level1[Math.floor(y)][Math.floor(x)] === 5) {
+			level ++;
+			return false;
+			} else {
+				return true;
+			}
+		} else {
+			return false;
+		}
 	}
 }
 
