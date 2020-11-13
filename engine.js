@@ -114,7 +114,7 @@ let mapData = {
 	map: 0,
 }
 
-function getCurrentLevelData() {
+function updateLevel() {
 	mapData.map = levelData["level" + level];
 }
 let player = {
@@ -168,7 +168,7 @@ function initScreen() {
 		strip.style.overflow = "hidden";
 		strip.style.backgroundColor = "magenta";
 		let img = new Image();
-		img.src = (window.opera ? "walls_19color.png" : "walls.png");
+		img.src = "walls_19color.png";
 		img.style.position = "absolute";
 		img.style.left = "0px";
 		strip.appendChild(img);
@@ -269,12 +269,12 @@ function castSingleRay(rayAngle, stripIdx) {
 	while (x >= 0 && x < mapWidth && y >= 0 && y < mapHeight) {
 		wallX = Math.floor(x + (right ? 0 : -1));
 		wallY = Math.floor(y);
-		getCurrentLevelData();
+		updateLevel();
 		if (mapData.map[wallY][wallX] > 0) {
 			let distX = x - player.x;
 			let distY = y - player.y;
 			dist = distX * distX + distY * distY;
-			getCurrentLevelData();
+			updateLevel();
 			wallType = mapData.map[wallY][wallX];
 			textureX = y % 1;
 			if (!right) textureX = 1 - textureX;
@@ -294,7 +294,7 @@ function castSingleRay(rayAngle, stripIdx) {
 	while (x >= 0 && x < mapWidth && y >= 0 && y < mapHeight) {
 		wallY = Math.floor(y + (up ? -1 : 0));
 		wallX = Math.floor(x);
-		getCurrentLevelData();
+		updateLevel();
 		if (mapData.map[wallY][wallX] > 0) {
 			distX = x - player.x;
 			distY = y - player.y;
@@ -303,7 +303,7 @@ function castSingleRay(rayAngle, stripIdx) {
 				dist = blockDist;
 				xHit = x;
 				yHit = y;
-				getCurrentLevelData();
+				updateLevel();
 				wallType = mapData.map[wallY][wallX];
 				textureX = x % 1;
 				if (up) textureX = 1 - textureX;
@@ -373,7 +373,7 @@ function isBlocking(x, y) {
 	if (y < 0 || y >= mapHeight || x < 0 || x >= mapWidth) {
 		return true;
 	} else {
-		getCurrentLevelData();
+		updateLevel();
 		if (mapData.map[Math.floor(y)][Math.floor(x)] != 0) {
 			if (mapData.map[Math.floor(y)][Math.floor(x)] === 5) {
 				level++;
@@ -430,7 +430,7 @@ function drawMiniMap() {
 	ctx.fillRect(0, 0, miniMap.width, miniMap.height);
 	for (let y = 0; y < mapHeight; y++) {
 		for (let x = 0; x < mapWidth; x++) {
-			getCurrentLevelData();
+			updateLevel();
 			let wall = mapData.map[y][x];
 			if (wall > 0) {
 				ctx.fillStyle = "rgb(200,200,200)";
