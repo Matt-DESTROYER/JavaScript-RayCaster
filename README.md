@@ -1,5 +1,5 @@
 # JavaScript-RayCaster
-A RayCaster made using JavaScript.
+A RayCaster made using JavaScript. Raycasting was one of the first ever techniques used to create 3D games. Raycasting essentialy gets the distances between a player character and surrounding walls/objects and uses those distances to draw lines. The length of the line is determined by the distance from the player which creates the 3D look.
 
 # Try it out
 Want to see the engine in action? Visit the this link:
