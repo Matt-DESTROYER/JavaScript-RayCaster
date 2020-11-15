@@ -21,7 +21,7 @@ Create your own levels:
 
 All level data is stored in the `levelData` object.
 
-To add a level, create a new nested object named `level` and the level number (e.g. if I am creating a seventh level it must be named `level7`) (it must be named this or the renderer will fail to retrieve the level data). Then add an array and within that array add 32 seperate numbers. Each number will be a cube shaped area when rendered. Now to create your actual level you need to change those numbers to be one of the following:
+To add a level, create a new nested object named `level` and the level number (e.g. if I am creating a seventh level it must be named `level7`) (it must be named this or the renderer will fail to retrieve the level data). Then add 24 arrays and within each array add 32 seperate numbers. Each number will be a cube shaped area when rendered. Now to create your actual level you need to change those numbers to be one of the following:
 - 0 (Invisible cube.)
 - 1 (Basic blue brick cube.)
 - 2 (Cage with skeleton cube.)
@@ -30,4 +30,4 @@ To add a level, create a new nested object named `level` and the level number (e
 - 5 (Pink level finish cube.)
 - (Note 0 and 5 are not solid.)
 
-To edit a level skip the adding a nested object and simply replace the numbers with the ones you choose.
+To simply edit a level skip the adding a nested object and simply replace the numbers with the ones you choose.
