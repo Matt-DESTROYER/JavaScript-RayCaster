@@ -175,7 +175,7 @@ function initScreen() {
 		strip.style.width = stripWidth + "px";
 		strip.style.height = "0px";
 		strip.style.overflow = "hidden";
-		strip.style.backgroundColor = "magenta";
+		strip.style.backgroundColor = "lime";
 		let img = new Image();
 		img.src = "walls_19color.png";
 		img.style.position = "absolute";
@@ -407,7 +407,6 @@ function isBlocking(x, y) {
 }
 
 function updateMiniMap() {
-	let miniMap = $("minimap");
 	let miniMapObjects = $("minimapobjects");
 	let objectCtx = miniMapObjects.getContext("2d");
 	miniMapObjects.width = miniMapObjects.width;
